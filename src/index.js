@@ -1,8 +1,8 @@
-import Biscoint from 'biscoint-api-node';
-import _ from 'lodash';
-import { Telegraf, Markup } from 'telegraf';
-import moment from 'moment';
-import cron from 'node-cron'
+const Biscoint = require('biscoint-api-node');
+const _ = require('lodash');
+const { Telegraf, Markup } = require('telegraf');
+const moment = require('moment');
+const cron = require('node-cron');
 
 // env variables
 let apiKey = process.env.API_KEY
