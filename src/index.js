@@ -207,7 +207,7 @@ async function tradeCycle() {
     const profit = percent(buyOffer.efPrice, sellOffer.efPrice);
     handleMessage(`[${tradeCycleCount}] Lucro calculado: ${profit.toFixed(3)}%`);
     handleMessage(`Modo simulação está com STATUS: ${simulation}`)
-    handleMessage(`Intervalo, em segundos, entre verificações de oportunidade de arbitragem ${intervalSeconds}`)
+    handleMessage(`Intervalo, em segundos, entre verificações de oportunidade de arbitragem: ${intervalSeconds}s`)
     if (
       profit >= minProfitPercent
     ) {
