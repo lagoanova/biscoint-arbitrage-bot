@@ -64,9 +64,6 @@ const keyboard = Markup.inlineKeyboard([
   ],
   [
     Markup.button.callback('\u{1F9FE} Extrato', 'extrato'),
-    Markup.button.callback('\u{1F4BE} Atualizar Saldo', 'restart')
-  ],
-  [
     Markup.button.callback('\u{1F4D6} Ajuda', 'help'),
     Markup.button.url('₿', 'https://www.biscoint.io')
   ],
@@ -107,18 +104,6 @@ bot.action('help', (ctx) => {
     *\u{1F9FE} Extrato:* Extrato com o saldo, valor de operação, lucro, etc.
     ============
     `, keyboard)
-}
-);
-
-bot.action('restart', async (ctx) => {
-  ctx.reply('Atualizando saldo inicial...');
-  try {
-    await startBalance();
-    await checkBalances();
-    await ctx.reply('Ok! Saldo inicial atualizado.');
-  } catch (error) {
-    ctx.reply('error');
-  }
 }
 );
 
@@ -166,16 +151,6 @@ const checkBalances = async () => {
     amount = amountBalance // define o amount com o saldo da corretora
   }
 };
-
-// Update balance
-const startBalance = async () => {
-  try {
-    let { BRL, BTC } = await bc.balance();
-    amount = BRL
-  } catch (error) {
-    handleMessage(`Erro: ${error}`)
-  }
-}
 
 // Checks that the configured interval is within the allowed rate limit.
 const checkInterval = async () => {
