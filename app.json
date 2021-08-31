@@ -20,11 +20,11 @@
         "required": true
       },
 	  "BOT_CHAT": {
-        "description": "Chat id do Telegram",
+        "description": "Chat id do Telegram. Exemplo: 14872718712",
         "required": true
       },
       "BOT_TOKEN": {
-        "description": "Token do Telegram",
+        "description": "Token do Telegram. Exemplo: 1688943477:ACDhWI4A0-cy--L3IGgjjp2yuPq2TC7TJvg",
         "required": true
       },
       "AMOUNT": {
