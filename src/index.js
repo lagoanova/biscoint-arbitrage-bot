@@ -99,7 +99,7 @@ bot.action('help', (ctx) => {
   ctx.replyWithMarkdown(
     `*Comandos disponíveis:* 
     ============  
-    *\u{1F51B} Iniciar Robô:* Incia as operações. Default no primeiro acesso.\n
+    *\u{1F51B} Iniciar Robô:* Incia as operações. É o padrão no primeiro acesso.\n
     *\u{1F6D1} Parar Robô:* Para as operações. Demais comandos ficam disponíveis.\n
     *\u{1F9FE} Extrato:* Extrato com o saldo, valor de operação, lucro, etc.
     ============
