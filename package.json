@@ -17,6 +17,7 @@
     "tslib": "^2.3.0"
   },
   "scripts": {
-    "start": "node -r esm src/index.js"
+    "start": "node -r esm src/index.js",
+	"test": "node -r esm src/test.js"
   }
 }
