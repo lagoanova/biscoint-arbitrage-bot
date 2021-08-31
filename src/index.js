@@ -1,18 +1,23 @@
 import Biscoint from 'biscoint-api-node';
 import _ from 'lodash';
-import player from 'play-sound';
+import { Telegraf, Markup } from 'telegraf';
+import moment from 'moment';
+const cron = require('node-cron')
 
 // env variables
-let apiKey = process.env.apiKey || "fc1f5d28fe37207fc65fad7c5f5bae1c8d0fa507d32b4da428826795b03f603f"
-let apiSecret = process.env.apiSecret || "33f053f96774ef618e6bac505f986eb089e3b0d4e5ef275199fcf1e252ddddda"
-let amount = process.env.amount || 100
-let amountCurrency = process.env.amountCurrency || "BRL"
-let initialBuy = process.env.initialBuy || true
-let minProfitPercent = process.env.minProfitPercent || 0.02
-let intervalSeconds = process.env.intervalSeconds || 'null'
-let playSound = process.env.playSound || false
-let simulation = process.env.simulation || false
-let executeMissedSecondLeg = process.env.executeMissedSecondLeg || true
+let apiKey = process.env.API_KEY
+let apiSecret = process.env.API_SECRET
+let amount = process.env.AMOUNT || 300
+let amountCurrency = process.env.AMOUNT_CURRENCY || "BRL"
+let initialBuy = process.env.INITIAL_BUY || true
+let minProfitPercent = process.env.MIN_PROFIT_PERCENT || 0.03
+let intervalSeconds = process.env.INTERVAL_SECONDS || null
+let simulation = process.env.SIMULATION || false
+let executeMissedSecondLeg = process.env.EXECUTE_MISSED_SECOND_LEG || true
+let token = process.env.BOT_TOKEN
+let botchat = process.env.BOT_CHAT
+let dataInicial = process.env.DATA_INICIAL || "01/09/2021"
+let valorInicial = process.env.VALOR_INICIAL || 300
 
 // global variables
 let bc, lastTrade = 0, isQuote, balances;
@@ -43,10 +48,95 @@ const init = () => {
   });
 };
 
+// Telegram
+if (token === undefined) {
+  throw new Error('BOT_TOKEN must be provided!')
+}
+
+const bot = new Telegraf(token)
+
+//bot.use(Telegraf.log())
+
+const keyboard = Markup.inlineKeyboard([
+  [
+    Markup.button.callback('\u{1F51B} Iniciar Robô', 'startbot'),
+    Markup.button.callback('\u{1F6D1} Parar Robô', 'stopbot')
+  ],
+  [
+    Markup.button.callback('\u{1F9FE} Extrato', 'extrato'),
+    Markup.button.callback('\u{1F4D6} Ajuda', 'help'),
+    Markup.button.url('₿', 'https://www.biscoint.io')
+  ],
+]).resize()
+
+// Commands Telegram
+bot.action('startbot', (ctx) => {
+  if (simulation == false) {
+    ctx.reply('\u{1F51B} O bot já está em operação', keyboard);
+  } else {
+    simulation = false
+    ctx.replyWithMarkdown(`\u{1F911} Iniciando Trades...\n 🚀 *Modo simulação:* desativado`, keyboard);
+  }
+}
+);
+
+bot.action('stopbot', (ctx) => {
+  if (simulation == true) {
+    ctx.reply('\u{1F6D1} O bot já está pausado', keyboard);
+  } else {
+    simulation = true
+    ctx.replyWithMarkdown(`\u{1F6D1} Ok! Robô parado para operações...\n ✈️ *Modo simulação:* ativado`, keyboard);
+  }
+}
+);
+
+bot.action('extrato', async (ctx) => {
+  await checkBalances();
+}
+);
+
+bot.action('help', (ctx) => {
+  ctx.replyWithMarkdown(
+    `*Comandos disponíveis:* 
+    ============  
+    *\u{1F51B} Iniciar Robô:* Incia as operações. Default no primeiro acesso.\n
+    *\u{1F6D1} Parar Robô:* Para as operações. Demais comandos ficam disponíveis.\n
+    *\u{1F9FE} Extrato:* Extrato com o saldo, valor de operação, lucro, etc.
+    ============
+    `, keyboard)
+}
+);
+
+bot.start((ctx) => ctx.reply('\u{1F911} Iniciando trades!', keyboard));
+
 // Checks that the balance necessary for the first operation is sufficient for the configured 'amount'.
 const checkBalances = async () => {
   balances = await bc.balance();
   const { BRL, BTC } = balances;
+
+  // Extrato
+  let lucro = await bc.ticker();
+  let valorTotal = BRL;
+  let moment1 = moment();
+  let moment2 = moment(dataInicial, "DD/MM/YYYY");
+  let dias = moment1.diff(moment2, 'days');
+  let lucroRealizado = percent(valorInicial, valorTotal);
+  await bot.telegram.sendMessage(botchat,
+    `\u{1F911} Balanço:
+    <b>Status</b>: ${!simulation ? `\u{1F51B} Robô operando.` : `\u{1F6D1} Robô parado.`} 
+    Data Inicial: ${moment2.format("DD/MM/YYYY")} 
+    Dias Operando: ${dias}
+    Depósito Inicial: R$ ${valorInicial}  
+    <b>BRL:</b> ${BRL} 
+    <b>BTC:</b> ${BTC} (R$ ${(lucro.last * BTC).toFixed(2)})
+    Operando com: R$ ${amount}
+    ============                                                
+    Lucro Parcial: ${lucroreal(valorTotal, lucro.last * BTC).toFixed(2)}% (R$ ${(lucro.last * BTC).toFixed(2)})
+    Lucro Realizado: ${lucroRealizado.toFixed(2)}% (R$ ${(valorTotal - valorInicial).toFixed(2)});
+    <b>Lucro Total:</b> ${(lucroreal(valorTotal, lucro.last * BTC) + lucroRealizado).toFixed(2)}% (R$ ${(lucro.last * BTC + (valorTotal - valorInicial)).toFixed(2)})
+    ============`, { parse_mode: "HTML" });
+  await bot.telegram.sendMessage(botchat, "Extrato executado!", keyboard)
+  // Fim Extrato
 
   handleMessage(`Balances:  BRL: ${BRL} - BTC: ${BTC} `);
 
@@ -56,8 +146,9 @@ const checkBalances = async () => {
     handleMessage(
       `Amount ${amount} is greater than the user's ${isQuote ? 'BRL' : 'BTC'} balance of ${amountBalance}`,
       'error',
-      true,
+      false,
     );
+    amount = amountBalance // define o amount com o saldo da corretora
   }
 };
 
@@ -116,6 +207,8 @@ async function tradeCycle() {
 
     const profit = percent(buyOffer.efPrice, sellOffer.efPrice);
     handleMessage(`[${tradeCycleCount}] Calculated profit: ${profit.toFixed(3)}%`);
+    handleMessage(`Modo simulação está com STATUS: ${simulation}`)
+    handleMessage(`Intervalo, em segundos, entre verificações de oportunidade de arbitragem ${intervalSeconds}`)
     if (
       profit >= minProfitPercent
     ) {
@@ -148,7 +241,7 @@ async function tradeCycle() {
         lastTrade = Date.now();
 
         handleMessage(`[${tradeCycleCount}] Success, profit: + ${profit.toFixed(3)}% (${finishedAt - startedAt} ms)`);
-        play();
+        bot.telegram.sendMessage(botchat, `\u{1F911} Sucesso! Lucro: + ${profit.toFixed(3)}%`, keyboard);
       } catch (error) {
         handleMessage(`[${tradeCycleCount}] Error on confirm offer: ${error.error}`, 'error');
         console.error(error);
@@ -183,10 +276,22 @@ async function tradeCycle() {
             }
           } catch (error) {
             handleMessage(
-              `[${tradeCycleCount}] Fatal error. Unable to recover from incomplete arbitrage. Exiting.`, 'fatal',
+              `[${tradeCycleCount}] Fatal error. Unable to recover from incomplete arbitrage. Exiting.`, 'error',
             );
-            await sleep(500);
-            process.exit(1);
+            //await sleep(500);
+            //process.exit(1);
+            try {
+              let { BRL, BTC } = await bc.balance();
+              if (BTC >= 0.001) {
+                bot.telegram.sendMessage(botchat, "Não foi possível confirmar a venda de BTC. O BTC será vendido a mercado!");
+                let lucroRealizado = await realizarLucro(BTC)
+                if (lucroRealizado) {
+                  bot.telegram.sendMessage(botchat, "Ok! Saldo em BTC foi vendido a mercado.", keyboard);
+                }
+              }
+            } catch (error) {
+              bot.telegram.sendMessage(botchat, `${JSON.stringify(error)}`);
+            }
           }
         }
       }
@@ -210,10 +315,49 @@ async function tradeCycle() {
 // Starts trading, scheduling trades to happen every 'intervalSeconds' seconds.
 const startTrading = async () => {
   handleMessage('Starting trades');
+  bot.telegram.sendMessage(botchat, '\u{1F911} Iniciando trades!');
   tradeCycle();
 };
 
 // -- UTILITY FUNCTIONS --
+async function realizarLucro(valor) {
+  return new Promise((resolve, reject) => {
+    (async () => {
+      try {
+        if (valor >= 0.001) {
+          let sellLucro = await bc.offer({
+            amount: valor,
+            isQuote: false,
+            op: 'sell',
+          });
+
+          try {
+            await bc.confirmOffer({
+              offerId: sellLucro.offerId,
+            });
+            let { BRL, BTC } = await bc.balance();
+            amount = BRL
+            resolve(true)
+          } catch (error) {
+            bot.telegram.sendMessage(botchat, `${error.error}. ${error.details} `);
+            reject(false)
+          }
+        }
+        else {
+          bot.telegram.sendMessage(botchat, "Valor de venda abaixo do limite mínimo de 0.001");
+          reject(false)
+        }
+      } catch (error) {
+        bot.telegram.sendMessage(botchat, `${error.error}. ${error.details} `);
+        reject(false)
+      }
+    })();
+  })
+}
+
+function lucroreal(value1, value2) {
+  return (Number(value2) / Number(value1)) * 100;
+}
 
 async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve(), ms));
@@ -230,15 +374,14 @@ function handleMessage(message, level = 'info', throwError = false) {
   }
 }
 
-const sound = playSound && player();
-
-const play = () => {
-  if (playSound) {
-    sound.play('./tone.mp3', (err) => {
-      if (err) console.log(`Could not play sound: ${err}`);
-    });
+// function cron
+cron.schedule("33 18 * * *", () => {
+  try {
+    bot.telegram.sendMessage(botchat, `\u{1F603} O bot está ativo e monitorando o mercado!`)
+  } catch (error) {
+    handleMessage('Error schedule');
   }
-};
+});
 
 // performs initialization, checks and starts the trading cycles.
 async function start() {
@@ -247,5 +390,7 @@ async function start() {
   await checkInterval();
   await startTrading();
 }
+
+bot.launch()
 
 start().catch(e => handleMessage(JSON.stringify(e), 'error'));
