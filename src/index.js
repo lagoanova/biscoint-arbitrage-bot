@@ -49,7 +49,7 @@ const init = () => {
 
 // Telegram
 if (token === undefined) {
-  throw new Error('BOT_TOKEN must be provided!')
+  throw new Error('BOT_TOKEN must be provided!');
 }
 
 const bot = new Telegraf(token)
