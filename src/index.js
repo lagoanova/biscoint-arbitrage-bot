@@ -1,13 +1,18 @@
 import Biscoint from 'biscoint-api-node';
 import _ from 'lodash';
 import player from 'play-sound';
-import config from './config.js';
 
-// read the configurations
-let {
-  apiKey, apiSecret, amount, amountCurrency, initialBuy, minProfitPercent, intervalSeconds, playSound, simulation,
-  executeMissedSecondLeg,
-} = config;
+// env variables
+let apiKey = process.env.apiKey || "fc1f5d28fe37207fc65fad7c5f5bae1c8d0fa507d32b4da428826795b03f603f"
+let apiSecret = process.env.apiSecret || "33f053f96774ef618e6bac505f986eb089e3b0d4e5ef275199fcf1e252ddddda"
+let amount = process.env.amount || 100
+let amountCurrency = process.env.amountCurrency || "BRL"
+let initialBuy = process.env.initialBuy || true
+let minProfitPercent = process.env.minProfitPercent || 0.02
+let intervalSeconds = process.env.intervalSeconds || 'null'
+let playSound = process.env.playSound || false
+let simulation = process.env.simulation || false
+let executeMissedSecondLeg = process.env.executeMissedSecondLeg || true
 
 // global variables
 let bc, lastTrade = 0, isQuote, balances;
@@ -33,8 +38,8 @@ const init = () => {
   isQuote = amountCurrency === 'BRL';
 
   bc = new Biscoint({
-    apiKey: config.apiKey,
-    apiSecret: config.apiSecret
+    apiKey: apiKey,
+    apiSecret: apiSecret
   });
 };
 
