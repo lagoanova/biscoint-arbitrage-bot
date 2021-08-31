@@ -190,7 +190,7 @@ async function tradeCycle() {
 
     finishedAt = Date.now();
 
-    handleMessage(`[${tradeCycleCount}] Got buy offer: ${buyOffer.efPrice} (${finishedAt - startedAt} ms)`);
+    handleMessage(`[${tradeCycleCount}] Oferta de compra: ${buyOffer.efPrice} (${finishedAt - startedAt} ms)`);
 
     startedAt = Date.now();
 
@@ -202,10 +202,10 @@ async function tradeCycle() {
 
     finishedAt = Date.now();
 
-    handleMessage(`[${tradeCycleCount}] Got sell offer: ${sellOffer.efPrice} (${finishedAt - startedAt} ms)`);
+    handleMessage(`[${tradeCycleCount}] Oferta de venda: ${sellOffer.efPrice} (${finishedAt - startedAt} ms)`);
 
     const profit = percent(buyOffer.efPrice, sellOffer.efPrice);
-    handleMessage(`[${tradeCycleCount}] Calculated profit: ${profit.toFixed(3)}%`);
+    handleMessage(`[${tradeCycleCount}] Lucro calculado: ${profit.toFixed(3)}%`);
     handleMessage(`Modo simulação está com STATUS: ${simulation}`)
     handleMessage(`Intervalo, em segundos, entre verificações de oportunidade de arbitragem ${intervalSeconds}`)
     if (
@@ -224,7 +224,7 @@ async function tradeCycle() {
         startedAt = Date.now();
 
         if (simulation) {
-          handleMessage(`[${tradeCycleCount}] Would execute arbitrage if simulation mode was not enabled`);
+          handleMessage(`[${tradeCycleCount}] Executaria arbitragem se o modo de simulação não estivesse habilitado`);
         } else {
           firstLeg = await bc.confirmOffer({
             offerId: firstOffer.offerId,
@@ -239,7 +239,7 @@ async function tradeCycle() {
 
         lastTrade = Date.now();
 
-        handleMessage(`[${tradeCycleCount}] Success, profit: + ${profit.toFixed(3)}% (${finishedAt - startedAt} ms)`);
+        handleMessage(`[${tradeCycleCount}] Sucesso, lucro: + ${profit.toFixed(3)}% (${finishedAt - startedAt} ms)`);
         bot.telegram.sendMessage(botchat, `\u{1F911} Sucesso! Lucro: + ${profit.toFixed(3)}%`, keyboard);
       } catch (error) {
         handleMessage(`[${tradeCycleCount}] Error on confirm offer: ${error.error}`, 'error');
