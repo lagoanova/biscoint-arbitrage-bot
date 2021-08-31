@@ -106,6 +106,5 @@ dist
 .idea
 
 config.json
-index.js
 tmp/
 yarn.lock
