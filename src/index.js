@@ -2,7 +2,7 @@ import Biscoint from 'biscoint-api-node';
 import _ from 'lodash';
 import { Telegraf, Markup } from 'telegraf';
 import moment from 'moment';
-const cron = require('node-cron')
+//const cron = require('node-cron')
 
 // env variables
 let apiKey = process.env.API_KEY
@@ -375,13 +375,6 @@ function handleMessage(message, level = 'info', throwError = false) {
 }
 
 // function cron
-cron.schedule("33 18 * * *", () => {
-  try {
-    bot.telegram.sendMessage(botchat, `\u{1F603} O bot está ativo e monitorando o mercado!`)
-  } catch (error) {
-    handleMessage('Error schedule');
-  }
-});
 
 // performs initialization, checks and starts the trading cycles.
 async function start() {
