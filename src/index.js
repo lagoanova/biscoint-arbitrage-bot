@@ -2,7 +2,6 @@ import Biscoint from 'biscoint-api-node';
 import _ from 'lodash';
 import { Telegraf, Markup } from 'telegraf';
 import moment from 'moment';
-//const cron = require('node-cron')
 
 // env variables
 let apiKey = process.env.API_KEY
@@ -373,8 +372,6 @@ function handleMessage(message, level = 'info', throwError = false) {
     throw new Error(message);
   }
 }
-
-// function cron
 
 // performs initialization, checks and starts the trading cycles.
 async function start() {
