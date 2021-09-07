@@ -199,7 +199,7 @@ async function tradeCycle() {
   tradeCycleCount += 1;
   const tradeCycleStartedAt = Date.now();
 
-  handleMessage(`[${tradeCycleCount}] Trade cycle started...`);
+  handleMessage(`[${tradeCycleCount}] Ciclo de trader iniciado...`);
 
   try {
 
@@ -401,6 +401,7 @@ function handleMessage(message, level = 'info', throwError = false) {
 async function start() {
   init();
   await checkBalances();
+  await inicializarSaldo();
   await checkInterval();
   await startTrading();
 }
