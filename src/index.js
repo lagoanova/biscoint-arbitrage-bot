@@ -240,7 +240,7 @@ async function tradeCycle() {
         lastTrade = Date.now();
 
         handleMessage(`[${tradeCycleCount}] Sucesso, lucro: + ${profit.toFixed(3)}% (${finishedAt - startedAt} ms)`);
-        bot.telegram.sendMessage(botchat, `\u{1F911} Sucesso! Lucro: + ${profit.toFixed(3)}%`, keyboard);
+        bot.telegram.sendMessage(botchat, `\u{1F911} Sucesso! Lucro: + ${profit.toFixed(3)}%`);
       } catch (error) {
         handleMessage(`[${tradeCycleCount}] Error on confirm offer: ${error.error}`, 'error');
         console.error(error);
@@ -285,7 +285,7 @@ async function tradeCycle() {
                 bot.telegram.sendMessage(botchat, "Não foi possível confirmar a venda de BTC. O BTC será vendido a mercado!");
                 let lucroRealizado = await realizarLucro(BTC)
                 if (lucroRealizado) {
-                  bot.telegram.sendMessage(botchat, "Ok! Saldo em BTC foi vendido a mercado.", keyboard);
+                  bot.telegram.sendMessage(botchat, "Ok! Saldo em BTC foi vendido a mercado.");
                 }
               }
             } catch (error) {
@@ -326,10 +326,9 @@ async function realizarLucro(valor) {
         if (valor >= 0.001) {
           let sellLucro = await bc.offer({
             amount: valor,
-            isQuote: false,
+            isQuote,
             op: 'sell',
           });
-
           try {
             await bc.confirmOffer({
               offerId: sellLucro.offerId,
@@ -338,7 +337,7 @@ async function realizarLucro(valor) {
             amount = BRL
             resolve(true)
           } catch (error) {
-            bot.telegram.sendMessage(botchat, `${error.error}. ${error.details} `);
+            bot.telegram.sendMessage(botchat, `${error.error}. ${error.details}`);
             reject(false)
           }
         }
