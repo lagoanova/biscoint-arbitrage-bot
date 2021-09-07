@@ -2,7 +2,7 @@
     "name": "bitcoin-bot",
     "description": "Arbitragem com Bitcoin",
     "logo": "https://biscoint.io/images/biscoint-icon.svg",
-    "repository": "https://github.com/lagoanova/biscoint-arbitrage-bot",
+    "repository": "https://github.com/coinbookbrasil/coinbook",
 	"formation": {
     "worker": {
       "quantity": 1,
