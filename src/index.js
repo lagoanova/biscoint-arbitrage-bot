@@ -59,7 +59,8 @@ const bot = new Telegraf(token)
 const keyboard = Markup.inlineKeyboard([
   [
     Markup.button.callback('\u{1F51B} Iniciar Robô', 'startbot'),
-    Markup.button.callback('\u{1F6D1} Parar Robô', 'stopbot')
+    Markup.button.callback('\u{1F6D1} Parar Robô', 'stopbot'),
+	Markup.button.callback('\u{1F4BE} Atualizar Saldo', 'restart')
   ],
   [
     Markup.button.callback('\u{1F9FE} Extrato', 'extrato'),
@@ -88,6 +89,18 @@ bot.action('stopbot', (ctx) => {
   }
 }
 );
+
+bot.action('restart', ctx => {
+  ctx.reply('Atualizando saldo inicial...');
+  try {
+    inicializarSaldo();
+    ctx.reply('Ok! Saldo inicial atualizado.');
+  } catch (error) {
+    logger.error(`Comando Restart:
+    ${error}`)
+    ctx.reply('error');
+  }
+});
 
 bot.action('extrato', async (ctx) => {
   await checkBalances();
@@ -150,6 +163,16 @@ const checkBalances = async () => {
     amount = amountBalance // define o amount com o saldo da corretora
   }
 };
+
+// Restart balance
+const inicializarSaldo = async () => {
+  try {
+    let { BRL, BTC } = await bc.balance();
+    amount = BRL
+  } catch (error) {
+    //imprimirMensagem(JSON.stringify(error));
+  }
+}
 
 // Checks that the configured interval is within the allowed rate limit.
 const checkInterval = async () => {
@@ -272,6 +295,7 @@ async function tradeCycle() {
                 offerId: secondLeg.offerId,
               });
               handleMessage(`[${tradeCycleCount}] The second leg was executed and the balance was normalized`);
+			  inicializarSaldo();
             }
           } catch (error) {
             handleMessage(
@@ -286,6 +310,7 @@ async function tradeCycle() {
                 let lucroRealizado = await realizarLucro(BTC)
                 if (lucroRealizado) {
                   bot.telegram.sendMessage(botchat, "Ok! Saldo em BTC foi vendido a mercado.");
+				  inicializarSaldo();
                 }
               }
             } catch (error) {
