@@ -87,15 +87,15 @@ bot.action('stopbot', (ctx) => {
 }
 );
 
-bot.action('restart', ctx => {
-  ctx.reply('Atualizando saldo inicial...');
+bot.action('restart', async ctx => {
+  await ctx.reply('Atualizando saldo inicial...');
   try {
     inicializarSaldo();
-    ctx.reply('Ok! Saldo inicial atualizado.');
+    await ctx.reply('Ok! Saldo inicial atualizado.');
   } catch (error) {
     logger.error(`Comando Restart:
     ${error}`)
-    ctx.reply('error');
+    await ctx.reply('error');
   }
 });
 
