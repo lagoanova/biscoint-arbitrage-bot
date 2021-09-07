@@ -67,7 +67,7 @@ const keyboard = Markup.inlineKeyboard([
     Markup.button.callback('\u{1F4D6} Ajuda', 'help'),
     Markup.button.url('₿', 'https://www.biscoint.io')
   ],
-]).resize()
+], { columns: 2 }).resize()
 
 // Commands Telegram
 bot.action('startbot', (ctx) => {
