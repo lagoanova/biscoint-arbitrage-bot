@@ -2,14 +2,14 @@
   "name": "biscoint-arbitrage-bot",
   "version": "2.0.0",
   "main": "index.js",
-  "engine": {
+  "engines": {
         "node": ">=14.0.0"
   },
   "repository": "https://github.com/Biscoint/biscoint-arbitrage-bot.git",
   "author": "Biscoint",
   "license": "MIT",
   "dependencies": {
-    "biscoint-api-node": "1.4.0",
+    "biscoint-api-node": "^1.4.0",
     "esm": "^3.2.25",
     "lodash": "^4.17.21",
     "node-cron": "^3.0.0",
