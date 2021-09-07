@@ -60,7 +60,7 @@ const keyboard = Markup.inlineKeyboard(
   [
     Markup.button.callback('\u{1F51B} Iniciar Robô', 'startbot'),
     Markup.button.callback('\u{1F6D1} Parar Robô', 'stopbot'),
-	Markup.button.callback('\u{1F4BE} Atualizar Saldo', 'restart'),
+    Markup.button.callback('\u{1F4BE} Atualizar Saldo', 'restart'),
     Markup.button.callback('\u{1F9FE} Extrato', 'extrato'),
     Markup.button.callback('\u{1F4D6} Ajuda', 'help'),
     Markup.button.url('₿', 'https://www.biscoint.io')
@@ -292,7 +292,7 @@ async function tradeCycle() {
                 offerId: secondLeg.offerId,
               });
               handleMessage(`[${tradeCycleCount}] The second leg was executed and the balance was normalized`);
-			  inicializarSaldo();
+              inicializarSaldo();
             }
           } catch (error) {
             handleMessage(
@@ -307,7 +307,7 @@ async function tradeCycle() {
                 let lucroRealizado = await realizarLucro(BTC)
                 if (lucroRealizado) {
                   bot.telegram.sendMessage(botchat, "Ok! Saldo em BTC foi vendido a mercado.");
-				  inicializarSaldo();
+                  inicializarSaldo();
                 }
               }
             } catch (error) {
@@ -320,6 +320,19 @@ async function tradeCycle() {
   } catch (error) {
     handleMessage(`[${tradeCycleCount}] Error on get offer: ${error.error || error.message}`, 'error');
     console.error(error);
+    try {
+      let { BRL, BTC } = await bc.balance();
+      if (BTC >= 0.001) {
+        bot.telegram.sendMessage(botchat, "Não foi possível confirmar a venda de BTC. O BTC será vendido a mercado!");
+        let lucroRealizado = await realizarLucro(BTC)
+        if (lucroRealizado) {
+          bot.telegram.sendMessage(botchat, "Ok! Saldo em BTC foi vendido a mercado.");
+          inicializarSaldo();
+        }
+      }
+    } catch (error) {
+      bot.telegram.sendMessage(botchat, `${JSON.stringify(error)}`);
+    }
   }
 
   const tradeCycleFinishedAt = Date.now();
