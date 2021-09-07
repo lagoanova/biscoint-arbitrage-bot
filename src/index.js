@@ -351,7 +351,7 @@ async function realizarLucro(valor) {
         if (valor >= 0.001) {
           let sellLucro = await bc.offer({
             amount: valor,
-            isQuote,
+            isQuote: false,
             op: 'sell',
           });
           try {
