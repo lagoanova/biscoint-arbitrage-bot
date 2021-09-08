@@ -2,6 +2,7 @@ import Biscoint from 'biscoint-api-node';
 import _ from 'lodash';
 import { Telegraf, Markup } from 'telegraf';
 import moment from 'moment';
+import Bottleneck from "bottleneck";
 
 // env variables
 let apiKey = process.env.API_KEY
@@ -20,6 +21,14 @@ let valorInicial = process.env.VALOR_INICIAL || 300
 
 // global variables
 let bc, lastTrade = 0, isQuote, balances;
+
+// Limiter Bottleneck
+const limiter = new Bottleneck({
+  reservoir: 30,
+  reservoirRefreshAmount: 30,
+  reservoirRefreshInterval: 60 * 1000,
+  maxConcurrent: 1,
+});
 
 // Initializes the Biscoint API connector object.
 const init = () => {
@@ -94,7 +103,7 @@ bot.action('restart', async ctx => {
     await ctx.reply('Ok! Saldo inicial atualizado.', keyboard);
   } catch (error) {
     handleMessage(`Comando Restart: ${error}`)
-    await ctx.reply('error');
+    await ctx.reply(error);
   }
 });
 
@@ -244,6 +253,7 @@ async function tradeCycle() {
 
         if (simulation) {
           handleMessage(`[${tradeCycleCount}] Executaria arbitragem se o modo de simulação não estivesse habilitado`);
+		  bot.telegram.sendMessage(botchat, `[${tradeCycleCount}] Executaria arbitragem se o modo de simulação não estivesse habilitado`);
         } else {
           firstLeg = await bc.confirmOffer({
             offerId: firstOffer.offerId,
@@ -343,7 +353,11 @@ async function tradeCycle() {
 
   // handleMessage(`[${cycleCount}] New cycle in ${shouldWaitMs} ms...`);
 
-  setTimeout(tradeCycle, shouldWaitMs);
+  //setTimeout(tradeCycle, shouldWaitMs);
+  
+  setTimeout(() => {
+  limiter.schedule(() => tradeCycle())
+}, shouldWaitMs);
 }
 
 // Starts trading, scheduling trades to happen every 'intervalSeconds' seconds.
