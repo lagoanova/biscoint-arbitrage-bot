@@ -87,7 +87,7 @@ const keyboard = Markup.inlineKeyboard(
   [
     Markup.button.callback('\u{1F51B} Iniciar Robô', 'startbot'),
     Markup.button.callback('\u{1F6D1} Parar Robô', 'stopbot'),
-    Markup.button.callback('\u{1F680} Acumular BTC', 'acbtc'),
+   // Markup.button.callback('\u{1F680} Acumular BTC', 'acbtc'),
     Markup.button.callback('\u{1F4BE} Atualizar Saldo', 'restart'),
     Markup.button.callback('\u{1F9FE} Extrato', 'extrato'),
     Markup.button.callback('\u{1F4D6} Ajuda', 'help'),
