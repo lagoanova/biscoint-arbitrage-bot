@@ -42,16 +42,6 @@
       "required": true,
       "value": "300.00"
     },
-    "AMOUNT_CURRENCY": {
-      "description": "informe a moeda, 'BRL', 'BTC' ou 'ETH', em que está especificada a quantidade (parâmetro amount). A moeda fiat padrão é 'BRL', e a criptomoeda padrão é 'BTC', por exemplo, se especificar 'BRL' a arbitragem será realizada no par BRL/BTC, e caso especifique 'ETH', a arbitragem será realizada no par BRL/ETH. O seu eventual lucro (ou prejuízo) de arbitragem será acumulado na moeda oposta, ou seja, se especificar 'BRL', seu lucro será acumulado em BTC, e se especificar 'BTC', seu lucro será acumulado em BRL. Valor padrão: 'BRL'.",
-      "required": true,
-      "value": "BRL"
-    },
-    "ACCUMULATE_BTC": {
-      "description": "Se deseja acumular BTC, preencha com o valor true. Padrão false",
-      "required": true,
-      "value": "false"
-    },
     "MIN_PROFIT_PERCENT": {
       "description": "Percentual de lucro para acionar o bot",
       "required": true,
@@ -66,31 +56,6 @@
       "description": "Data que o bot iniciou. xx/xx/xxxx",
       "required": true,
       "value": "15/03/2020"
-    },
-    "BOT_ID": {
-      "description": "Id do bot: bot_1 ou bot_2",
-      "required": true,
-      "value": "bot_1"
-    },
-    "HOST1": {
-      "description": "Servidor principal do bot",
-      "required": true,
-      "value": "143.198.237.4"
-    },
-    "HOST2": {
-      "description": "Servidor secundário do bot",
-      "required": true,
-      "value": "128.199.0.198"
-    },
-    "PORTA": {
-      "description": "Servidor secundário do bot",
-      "required": true,
-      "value": "80"
-    },
-    "MULTIBOT": {
-      "description": "Servidor secundário do bot",
-      "required": true,
-      "value": "true"
     }
   }
 }
