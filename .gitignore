@@ -107,5 +107,6 @@ dist
 
 config.json
 tmp/
+bkp/
 yarn.lock
 test.js
