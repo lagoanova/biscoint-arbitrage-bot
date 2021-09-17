@@ -110,3 +110,5 @@ tmp/
 bkp/
 yarn.lock
 test.js
+src/test.js
+src/config.js
