@@ -100,7 +100,7 @@ bot.action('startbot', (ctx) => {
     ctx.reply('\u{1F51B} O bot já está em operação', keyboard);
   } else {
     play = true
-    ctx.replyWithMarkdown(`\u{1F911} Iniciando Trades...\n 🚀 *Modo simulação:* desativado`, keyboard);
+    ctx.replyWithMarkdown(`\u{1F911} Iniciando Trades...`, keyboard);
   }
 }
 );
@@ -110,7 +110,7 @@ bot.action('stopbot', (ctx) => {
     ctx.reply('\u{1F6D1} O bot já está pausado', keyboard);
   } else {
     play = false
-    ctx.replyWithMarkdown(`\u{1F6D1} Ok! Robô parado para operações...\n ✈️ *Modo simulação:* ativado`, keyboard);
+    ctx.replyWithMarkdown(`\u{1F6D1} Ok! Robô parado para operações...`, keyboard);
   }
 }
 );
@@ -222,7 +222,7 @@ const checkInterval = async () => {
 
   if (!intervalSeconds) {
     intervalSeconds = minInterval;
-    handleMessage(`Setting interval to ${intervalSeconds}s`);
+    handleMessage(`Setando intervalo para ${intervalSeconds}s`);
   } else if (intervalSeconds < minInterval) {
     //handleMessage(`Interval too small (${intervalSeconds}s). Must be higher than ${minInterval.toFixed(1)}s`, 'error', false);
     handleMessage(`Interval too small (${intervalSeconds}s). Must be higher than ${minInterval.toFixed(1)}s`);
