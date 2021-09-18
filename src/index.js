@@ -100,7 +100,7 @@ bot.action('startbot', (ctx) => {
     ctx.reply('\u{1F51B} O bot já está em operação', keyboard);
   } else {
     play = true
-    ctx.replyWithMarkdown(`\u{1F911} Iniciando Trades...`, keyboard);
+    ctx.replyWithMarkdown(`\u{1F911} Iniciando Trades...\n 🚀 *Modo simulação:* desativado`, keyboard);
   }
 }
 );
@@ -110,7 +110,7 @@ bot.action('stopbot', (ctx) => {
     ctx.reply('\u{1F6D1} O bot já está pausado', keyboard);
   } else {
     play = false
-    ctx.replyWithMarkdown(`\u{1F6D1} Ok! Robô parado para operações...`, keyboard);
+    ctx.replyWithMarkdown(`\u{1F6D1} Ok! Robô parado para operações...\n ✈️ *Modo simulação:* ativado`, keyboard);
   }
 }
 );
@@ -222,7 +222,7 @@ const checkInterval = async () => {
 
   if (!intervalSeconds) {
     intervalSeconds = minInterval;
-    handleMessage(`Setando intervalo para ${intervalSeconds}s`);
+    handleMessage(`Setting interval to ${intervalSeconds}s`);
   } else if (intervalSeconds < minInterval) {
     //handleMessage(`Interval too small (${intervalSeconds}s). Must be higher than ${minInterval.toFixed(1)}s`, 'error', false);
     handleMessage(`Interval too small (${intervalSeconds}s). Must be higher than ${minInterval.toFixed(1)}s`);
@@ -297,7 +297,7 @@ async function trader() {
             } else if (BTC >= 0.001) {
               try {
                 bot.telegram.sendMessage(botchat, "Tentando realizar o lucro...");
-                let priceBTC = await bc.ticker();
+                //let priceBTC = await bc.ticker();
                 let { BRL, BTC } = await bc.balance();
                 let lucroRealizado = await realizarLucro(BTC)
                 if (lucroRealizado) {
@@ -337,7 +337,7 @@ async function trader() {
               try {
                 bot.telegram.sendMessage(botchat, "Tentando realizar o lucro...");
                 let priceBTC = await bc.ticker();
-                let { BRL, BTC } = await bc.balance();
+                //let { BRL, BTC } = await bc.balance();
                 let lucroRealizado = await realizarLucro(BTC)
                 if (lucroRealizado) {
                   bot.telegram.sendMessage(botchat, "ok! Lucro realizado", keyboard);
@@ -375,7 +375,7 @@ async function trader() {
         } else if (BTC >= 0.001) {
           try {
             bot.telegram.sendMessage(botchat, "Tentando realizar o lucro...");
-            let priceBTC = await bc.ticker();
+            //let priceBTC = await bc.ticker();
             let { BRL, BTC } = await bc.balance();
             let lucroRealizado = await realizarLucro(BTC)
             if (lucroRealizado) {
@@ -477,8 +477,8 @@ function imprimirMensagem(message, throwError = false) {
 // performs initialization, checks and starts the trading cycles.
 async function start() {
   init();
-  await checkBalances();
   await inicializarSaldo();
+  await checkBalances();
   await checkInterval();
   await startTrading();
 }
