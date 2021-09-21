@@ -6,8 +6,8 @@ import axios from 'axios';
 import Bottleneck from "bottleneck";
 
 // env variables
-let apiKey = process.env.APIKEY || "4d2b41a60ffe28a561d0883f9dba496f6e7178621a53737b180d449a58035603"
-let apiSecret = process.env.APISECRET || "c3690b1c6000f48e64dfc77c6c895ad3efd5a09c21c84106d1ffb0d84510db69"
+let apiKey = process.env.APIKEY
+let apiSecret = process.env.APISECRET
 let amount = process.env.AMOUNT || 300
 let amountCurrency = process.env.AMOUNT_CURRENCY || "BRL"
 let initialBuy = process.env.INITIAL_BUY || true
@@ -15,8 +15,8 @@ let minProfitPercent = process.env.MIN_PROFIT_PERCENT || 0.7
 let intervalSeconds = process.env.INTERVAL_SECONDS || null
 let play = process.env.SIMULATION || false
 let executeMissedSecondLeg = process.env.EXECUTE_MISSED_SECOND_LEG || true
-let token = process.env.BOT_TOKEN || "1952003996:AAGrQttRROPzFF0YVVTEjojYKUXC4wdjpms"
-let botchat = process.env.BOT_CHAT || "123425682"
+let token = process.env.BOT_TOKEN
+let botchat = process.env.BOT_CHAT
 let dataInicial = process.env.DATA_INICIAL || "01/09/2021"
 let valorInicial = process.env.VALOR_INICIAL || 300
 let botId = process.env.BOT_ID || "bot_1"
