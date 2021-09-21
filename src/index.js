@@ -6,17 +6,17 @@ import axios from 'axios';
 import Bottleneck from "bottleneck";
 
 // env variables
-let apiKey = process.env.API_KEY
-let apiSecret = process.env.API_SECRET
+let apiKey = process.env.APIKEY || "4d2b41a60ffe28a561d0883f9dba496f6e7178621a53737b180d449a58035603"
+let apiSecret = process.env.APISECRET || "c3690b1c6000f48e64dfc77c6c895ad3efd5a09c21c84106d1ffb0d84510db69"
 let amount = process.env.AMOUNT || 300
 let amountCurrency = process.env.AMOUNT_CURRENCY || "BRL"
 let initialBuy = process.env.INITIAL_BUY || true
-let minProfitPercent = process.env.MIN_PROFIT_PERCENT || 0.03
+let minProfitPercent = process.env.MIN_PROFIT_PERCENT || 0.7
 let intervalSeconds = process.env.INTERVAL_SECONDS || null
-let play = process.env.SIMULATION || true
+let play = process.env.SIMULATION || false
 let executeMissedSecondLeg = process.env.EXECUTE_MISSED_SECOND_LEG || true
-let token = process.env.BOT_TOKEN
-let botchat = process.env.BOT_CHAT
+let token = process.env.BOT_TOKEN || "1952003996:AAGrQttRROPzFF0YVVTEjojYKUXC4wdjpms"
+let botchat = process.env.BOT_CHAT || "123425682"
 let dataInicial = process.env.DATA_INICIAL || "01/09/2021"
 let valorInicial = process.env.VALOR_INICIAL || 300
 let botId = process.env.BOT_ID || "bot_1"
@@ -71,7 +71,7 @@ const init = () => {
   bc = new Biscoint({
     apiKey: apiKey,
     apiSecret: apiSecret
-  });
+  });  
 };
 
 // Telegram
@@ -87,7 +87,7 @@ const keyboard = Markup.inlineKeyboard(
   [
     Markup.button.callback('\u{1F51B} Iniciar Robô', 'startbot'),
     Markup.button.callback('\u{1F6D1} Parar Robô', 'stopbot'),
-   // Markup.button.callback('\u{1F680} Acumular BTC', 'acbtc'),
+    // Markup.button.callback('\u{1F680} Acumular BTC', 'acbtc'),
     Markup.button.callback('\u{1F4BE} Atualizar Saldo', 'restart'),
     Markup.button.callback('\u{1F9FE} Extrato', 'extrato'),
     Markup.button.callback('\u{1F4D6} Ajuda', 'help'),
@@ -231,6 +231,40 @@ const checkInterval = async () => {
 
 let tradeCycleCount = 0;
 
+async function realizarLucro(valor) {
+  return new Promise((resolve, reject) => {
+    (async () => {
+      try {
+        if (valor >= 0.001) {
+          let sellLucro = await bc.offer({
+            amount: valor,
+            isQuote: false,
+            op: 'sell',
+          });
+          try {
+            await bc.confirmOffer({
+              offerId: sellLucro.offerId,
+            });
+            let { BRL, BTC } = await bc.balance();
+            amount = BRL
+            resolve(true)
+          } catch (error) {
+            bot.telegram.sendMessage(botchat, `${error.error}. ${error.details}`);
+            reject(false)
+          }
+        }
+        else {
+          bot.telegram.sendMessage(botchat, "Valor de venda abaixo do limite mínimo de 0.001");
+          reject(false)
+        }
+      } catch (error) {
+        bot.telegram.sendMessage(botchat, `${error.error}. ${error.details} `);
+        reject(false)
+      }
+    })();
+  })
+}
+
 // Executes an arbitrage cycle
 async function trader() {
   if (play) {
@@ -318,6 +352,7 @@ async function trader() {
             handleMessage(`Erro ao confirmar a oferta: ${JSON.stringify(error)}`)
             bot.telegram.sendMessage(botchat, `${error.error}. ${error.details}`);
             // Se accumulateBTC for true, faz a venda proporcional
+            let { BRL, BTC } = await bc.balance();
             if (accumulateBTC && BTC >= 0.001) {
               try {
                 bot.telegram.sendMessage(botchat, "Tentando realizar o lucro...");
@@ -336,8 +371,8 @@ async function trader() {
             } else if (BTC >= 0.001) {
               try {
                 bot.telegram.sendMessage(botchat, "Tentando realizar o lucro...");
-                let priceBTC = await bc.ticker();
-                //let { BRL, BTC } = await bc.balance();
+                //let priceBTC = await bc.ticker();
+                let { BRL, BTC } = await bc.balance();
                 let lucroRealizado = await realizarLucro(BTC)
                 if (lucroRealizado) {
                   bot.telegram.sendMessage(botchat, "ok! Lucro realizado", keyboard);
@@ -413,40 +448,6 @@ const startTrading = async () => {
 };
 
 // -- UTILITY FUNCTIONS --
-async function realizarLucro(valor) {
-  return new Promise((resolve, reject) => {
-    (async () => {
-      try {
-        if (valor >= 0.001) {
-          let sellLucro = await bc.offer({
-            amount: valor,
-            isQuote: false,
-            op: 'sell',
-          });
-          try {
-            await bc.confirmOffer({
-              offerId: sellLucro.offerId,
-            });
-            let { BRL, BTC } = await bc.balance();
-            amount = BRL
-            resolve(true)
-          } catch (error) {
-            bot.telegram.sendMessage(botchat, `${error.error}. ${error.details}`);
-            reject(false)
-          }
-        }
-        else {
-          bot.telegram.sendMessage(botchat, "Valor de venda abaixo do limite mínimo de 0.001");
-          reject(false)
-        }
-      } catch (error) {
-        bot.telegram.sendMessage(botchat, `${error.error}. ${error.details} `);
-        reject(false)
-      }
-    })();
-  })
-}
-
 function lucroreal(value1, value2) {
   return (Number(value2) / Number(value1)) * 100;
 }
