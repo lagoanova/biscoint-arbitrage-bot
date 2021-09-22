@@ -229,8 +229,6 @@ const checkInterval = async () => {
   }
 };
 
-let tradeCycleCount = 0;
-
 async function realizarLucro(valor) {
   return new Promise((resolve, reject) => {
     (async () => {
